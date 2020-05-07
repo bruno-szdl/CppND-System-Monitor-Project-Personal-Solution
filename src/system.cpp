@@ -9,16 +9,22 @@
 #include "system.h"
 #include "linux_parser.h"
 
-using std::set;
-using std::size_t;
-using std::string;
-using std::vector;
-
 // TODO: Return the system's CPU
 Processor& System::Cpu() { return cpu_; }
 
 // TODO: Return a container composed of the system's processes
-vector<Process>& System::Processes() { return processes_; }
+std::vector<Process>& System::Processes() {
+    processes_.clear();
+    std::vector<int> pids = LinuxParser::Pids();
+    
+    for (int pid : pids){
+        Process process(pid);
+        processes_.emplace_back(process);
+    }
+
+    std::sort(processes_.begin(), processes_.end(), [](Process const& a, Process const& b) {return a < b;});
+    return processes_;
+}
 
 // TODO: Return the system's kernel identifier (string)
 std::string System::Kernel() const { return LinuxParser::Kernel(); }
